@@ -84,7 +84,7 @@ app.get("/", (request, response) => {
 
 //Route per pagina lista note
 app.get("/lista_note", accessoSicuro, (request, response) => {
-  Note.find({})
+  Note.find({ utente: request.user.id })
     .sort({ date: "desc" })
     .then(note => {
       response.render("lista_note", { note: note });
@@ -94,7 +94,12 @@ app.get("/lista_note", accessoSicuro, (request, response) => {
 //Route per pagina modifica nota
 app.get("/modifica_nota/:id", accessoSicuro, (request, response) => {
   Note.findOne({ _id: request.params.id }).then(nota => {
-    response.render("modifica_nota", { nota: nota });
+    if (nota.utente != request.user.id) {
+      request.flash("msg_errore", "Non puoi vedere questi contenuti");
+      response.redirect("/lista_note");
+    } else {
+      response.render("modifica_nota", { nota: nota });
+    }
   });
 });
 
@@ -138,7 +143,8 @@ app.post("/aggiungi_nota", accessoSicuro, (request, response) => {
   } else {
     const nuovaNota = {
       titolo: request.body.titolo,
-      contenuto: request.body.contenuto
+      contenuto: request.body.contenuto,
+      utente: request.user.id
     };
 
     new Note(nuovaNota).save().then(note => {
