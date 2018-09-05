@@ -12,21 +12,30 @@
             <li class="nav-item">
                 <a class="nav-link" href="/info">Info</a>
             </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            {{#if user}}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Note
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/lista_note">Lista Note</a>
+                    <a class="dropdown-item" href="/aggiungi_nota">Nuova Nota</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="/logout" class="nav-link">Logout</a>
+            </li>
+            {{else}}
             <li class="nav-item">
                 <a class="nav-link" href="/login">Login</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/registrazione">Registrazione</a>
             </li>
+            {{/if}}
         </ul>
     </div>
-    <div class="dropdown">
-        <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Note
-        </a>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="/lista_note">Lista Note</a>
-            <a class="dropdown-item" href="/aggiungi_nota">Nuova Nota</a>
-        </div>
-    </div>
+
 </nav>

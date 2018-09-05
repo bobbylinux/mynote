@@ -8,6 +8,8 @@ const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const mongoose = require("mongoose");
 
+const { accessoSicuro } = require("./helpers/accesso_privato");
+
 const app = express();
 const port = 3000;
 
@@ -70,6 +72,7 @@ app.use((request, response, next) => {
   response.locals.msg_successo = request.flash("msg_successo");
   response.locals.msg_errore = request.flash("msg_errore");
   response.locals.error = request.flash("error");
+  response.locals.user = request.user;
   next();
 });
 
@@ -80,7 +83,7 @@ app.get("/", (request, response) => {
 });
 
 //Route per pagina lista note
-app.get("/lista_note", (request, response) => {
+app.get("/lista_note", accessoSicuro, (request, response) => {
   Note.find({})
     .sort({ date: "desc" })
     .then(note => {
@@ -89,7 +92,7 @@ app.get("/lista_note", (request, response) => {
 });
 
 //Route per pagina modifica nota
-app.get("/modifica_nota/:id", (request, response) => {
+app.get("/modifica_nota/:id", accessoSicuro, (request, response) => {
   Note.findOne({ _id: request.params.id }).then(nota => {
     response.render("modifica_nota", { nota: nota });
   });
@@ -101,7 +104,7 @@ app.get("/info", (request, response) => {
 });
 
 //Route per pagina aggiungi nota
-app.get("/aggiungi_nota", (request, response) => {
+app.get("/aggiungi_nota", accessoSicuro, (request, response) => {
   response.render("aggiungi_nota");
 });
 
@@ -116,7 +119,7 @@ app.get("/registrazione", (request, response) => {
 });
 
 //Route per form aggiunta nota
-app.post("/aggiungi_nota", (request, response) => {
+app.post("/aggiungi_nota", accessoSicuro, (request, response) => {
   let errori = [];
   if (!request.body.titolo) {
     errori.push({ text: "Devi riempire questo campo titolo" });
@@ -146,7 +149,7 @@ app.post("/aggiungi_nota", (request, response) => {
 });
 
 //gestione del form: aggiorna
-app.post("/lista_note/:id", (request, response) => {
+app.post("/lista_note/:id", accessoSicuro, (request, response) => {
   Note.findOne({ _id: request.params.id }).then(nota => {
     nota.titolo = request.body.titolo;
     nota.contenuto = request.body.contenuto;
@@ -159,7 +162,7 @@ app.post("/lista_note/:id", (request, response) => {
 });
 
 //gestione per eliminazione documento
-app.delete("/lista_note/:id", (request, response) => {
+app.delete("/lista_note/:id", accessoSicuro, (request, response) => {
   Note.deleteOne({
     _id: request.params.id
   }).then(nota => {
@@ -238,6 +241,16 @@ app.post("/login", (request, response, next) => {
 
 app.listen(port, () => {
   console.log(`server attivato sulla porta ${port}`);
+});
+
+//gestione logout
+app.get("/logout", accessoSicuro, (request, response) => {
+  request.logout();
+  request.flash(
+    "msg_successo",
+    "Sei disconnesso. Ciao, alla prossima sessione"
+  );
+  response.redirect("/");
 });
 
 //uso di base di middleware
