@@ -11,7 +11,7 @@ const mongoose = require("mongoose");
 const { accessoSicuro } = require("./helpers/accesso_privato");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 //Cartelle per gestione delle risorse statiche.
 app.use("/css", express.static(__dirname + "/assets/css"));
@@ -20,11 +20,14 @@ app.use("/img", express.static(__dirname + "/assets/img"));
 //integrazione file configurazione passport
 require("./config/passport")(passport);
 
+//integrazione file configurazione database
+const db = require("./config/database");
+
 //Connessione a Mongoose
 mongoose.Promise = global.Promise;
 mongoose
   .connect(
-    "mongodb://127.0.0.1:27017/note",
+    db.mongoURI,
     { useNewUrlParser: true }
   )
   .then(() => {

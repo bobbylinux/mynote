@@ -4,8 +4,10 @@
   "description": "app per scrivere note in libertà",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {"node":"10.9.0"},
   "author": "Roberto Bani",
   "license": "ISC",
   "dependencies": {
