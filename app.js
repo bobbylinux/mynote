@@ -16,7 +16,7 @@ app.use("/css", express.static(__dirname + "/assets/css"));
 app.use("/img", express.static(__dirname + "/assets/img"));
 
 //integrazione file configurazione passport
-require('./config/passport')(passport);
+require("./config/passport")(passport);
 
 //Connessione a Mongoose
 mongoose.Promise = global.Promise;
@@ -61,11 +61,15 @@ app.use(
 //Middleware per messaggi flash
 app.use(flash());
 
+//Middleware passportjs
+app.use(passport.initialize());
+app.use(passport.session());
+
 //Variabili globali per messaggi flash
 app.use((request, response, next) => {
   response.locals.msg_successo = request.flash("msg_successo");
   response.locals.msg_errore = request.flash("msg_errore");
-  response.locals.errore = request.flash("errore");
+  response.locals.error = request.flash("error");
   next();
 });
 
@@ -228,13 +232,14 @@ app.post("/login", (request, response, next) => {
   passport.authenticate("local", {
     successRedirect: "/lista_note",
     failureRedirect: "/login",
-    flash: true
+    failureFlash: true
   })(request, response, next);
 });
 
 app.listen(port, () => {
   console.log(`server attivato sulla porta ${port}`);
 });
+
 //uso di base di middleware
 /*app.use((request, response, next) => {
     request.saluto = "io sono la prima app in node, ciao";
